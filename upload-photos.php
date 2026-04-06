@@ -1,10 +1,6 @@
 <?php
 header('Content-Type: application/json');
 
-// Enable error reporting for debugging
-error_reporting(E_ALL);
-ini_set('display_errors', 1);
-
 // Check if request is POST
 if ($_SERVER['REQUEST_METHOD'] !== 'POST') {
     http_response_code(405);
@@ -43,41 +39,57 @@ if (!is_dir($roomDir)) {
     }
 }
 
+// Allowed MIME types and max file size (10 MB)
+$allowedMimes = array('image/jpeg', 'image/png', 'image/gif', 'image/webp');
+$maxBytes = 10 * 1024 * 1024;
+
+function validateAndSave($tmpPath, $originalName, $roomDir, $allowedMimes, $maxBytes) {
+    $mime = mime_content_type($tmpPath);
+    if (!in_array($mime, $allowedMimes, true)) {
+        return 'File type not allowed: ' . $originalName;
+    }
+    if (filesize($tmpPath) > $maxBytes) {
+        return 'File too large (max 10 MB): ' . $originalName;
+    }
+    // Use a safe filename: sanitize and preserve extension from MIME
+    $ext = explode('/', $mime)[1];
+    if ($ext === 'jpeg') $ext = 'jpg';
+    $safeName = preg_replace('/[^a-zA-Z0-9\-_]/', '_', pathinfo($originalName, PATHINFO_FILENAME)) . '.' . $ext;
+    if (!move_uploaded_file($tmpPath, $roomDir . '/' . $safeName)) {
+        return 'Failed to save file: ' . $originalName;
+    }
+    return $safeName;
+}
+
 // Handle uploaded files
 $uploadedFiles = array();
 if (isset($_FILES['photos'])) {
     $files = $_FILES['photos'];
-    
+
     // Handle both single file and array of files
     if (is_array($files['name'])) {
         $count = count($files['name']);
         for ($i = 0; $i < $count; $i++) {
             if ($files['error'][$i] === UPLOAD_ERR_OK) {
-                $originalName = basename($files['name'][$i]);
-                $targetPath = $roomDir . '/' . $originalName;
-                
-                if (move_uploaded_file($files['tmp_name'][$i], $targetPath)) {
-                    $uploadedFiles[] = $originalName;
-                } else {
-                    http_response_code(500);
-                    echo json_encode(array('error' => 'Failed to save file: ' . $originalName));
+                $result = validateAndSave($files['tmp_name'][$i], $files['name'][$i], $roomDir, $allowedMimes, $maxBytes);
+                if (strpos($result, 'File') === 0 && strpos($result, '.') === false) {
+                    http_response_code(400);
+                    echo json_encode(array('error' => $result));
                     exit;
                 }
+                $uploadedFiles[] = $result;
             }
         }
     } else {
         // Single file
         if ($files['error'] === UPLOAD_ERR_OK) {
-            $originalName = basename($files['name']);
-            $targetPath = $roomDir . '/' . $originalName;
-            
-            if (move_uploaded_file($files['tmp_name'], $targetPath)) {
-                $uploadedFiles[] = $originalName;
-            } else {
-                http_response_code(500);
-                echo json_encode(array('error' => 'Failed to save file'));
+            $result = validateAndSave($files['tmp_name'], $files['name'], $roomDir, $allowedMimes, $maxBytes);
+            if (strpos($result, 'File') === 0 && strpos($result, '.') === false) {
+                http_response_code(400);
+                echo json_encode(array('error' => $result));
                 exit;
             }
+            $uploadedFiles[] = $result;
         }
     }
 }

@@ -14,7 +14,7 @@ function setAuthenticated(){ sessionStorage.setItem(SESSION_KEY,'true'); }
 function clearAuthentication(){ sessionStorage.removeItem(SESSION_KEY); }
 
 // ====== Config Storage ======
-function getConfig(){ try{ const cfg=localStorage.getItem(CONFIG_KEY); return cfg?JSON.parse(cfg):{storageType:'remote',apiUrl:'../api.php',tableName:'conference_rooms',dbUsername:'conf_user',dbPassword:'JHSdfuy45klaye45'}; }catch{ return {storageType:'remote',apiUrl:'../api.php',tableName:'conference_rooms',dbUsername:'conf_user',dbPassword:'JHSdfuy45klaye45'}; } }
+function getConfig(){ try{ const cfg=localStorage.getItem(CONFIG_KEY); return cfg?JSON.parse(cfg):{storageType:'remote',apiUrl:'../api.php',tableName:'conference_rooms',dbUsername:'',dbPassword:''}; }catch{ return {storageType:'remote',apiUrl:'../api.php',tableName:'conference_rooms',dbUsername:'',dbPassword:''}; } }
 function saveConfig(cfg){ try{ localStorage.setItem(CONFIG_KEY, JSON.stringify(cfg)); }catch{} }
 
 // ====== DOM Helpers ======
