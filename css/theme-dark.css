@@ -1,0 +1,17 @@
+/* Dark theme variables */
+:root{
+  --bg: #0b0f14;
+  --text: #e6e6e6;
+  --muted: #9aa7b3;
+  --line: #1f2a37;
+  --accent: #367C2B;
+  --accent-2: #1b2b1b;
+  --jd-green: #367C2B;
+  --jd-yellow: #FFDE00;
+  --jd-black: #27251F;
+  --card-bg: #0f1511;
+  --field-bg: #0c1118;
+  --nested-bg: #0d1220;
+  --toolbar-bg: rgba(15,23,18,.9);
+}
+

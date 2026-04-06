@@ -1,0 +1,30 @@
+# Copy this to .gitignore in your project root to avoid committing large files
+
+# SQL.js offline files (8 MB total - download locally, don't commit)
+lib/sql-wasm.js
+lib/sql-wasm.wasm
+
+# Browser cache and temporary files
+.DS_Store
+Thumbs.db
+*.swp
+*.swo
+*~
+
+# Node modules (if using package.json)
+node_modules/
+package-lock.json
+yarn.lock
+
+# IDE files
+.vscode/
+.idea/
+*.sublime-workspace
+*.sublime-project
+
+# Build and backup files
+dist/
+build/
+*.bak
+*.tmp
+*.log

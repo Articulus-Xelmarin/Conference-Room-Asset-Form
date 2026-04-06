@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Room Asset Viewer - Find Room</title>
+  <link rel="stylesheet" href="../css/theme-dark.css" />
+  <link rel="stylesheet" href="../css/theme-light.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+          <h1>Room Asset Viewer</h1>
+          <p>Find a room and view all its AV assets and equipment <span class="muted">(v0.3.0)</span></p>
+        </div>
+        <div class="hdr-actions">
+          <button type="button" class="btn ghost" id="themeToggle" aria-pressed="false" title="Toggle light/dark mode"><span class="theme-label">Mode: Dark</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap finder-container">
+    <input type="text" id="roomSearch" class="search-bar" placeholder="Filter rooms by name, location, or equipment..."/>
+    <div id="roomList" class="room-list">
+      <div class="loading">Loading rooms...</div>
+    </div>
+
+    <div class="footer-actions">
+      <a href="../index.html" class="btn secondary">Back to Form</a>
+      <a href="../database/manager/index.html" class="btn secondary">Database Manager</a>
+    </div>
+  </main>
+
+  <script src="../js/theme.js"></script>
+  <script src="../js/sqlite-db.js"></script>
+  <script src="finder.js"></script>
+</body>
+</html>

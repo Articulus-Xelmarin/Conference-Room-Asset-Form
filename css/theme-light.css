@@ -1,0 +1,22 @@
+/* Light theme variables */
+html[data-theme="light"]{
+  --bg: #f3f4f6;
+  --text: #111827;
+  --muted: #4b5563;
+  --line: #d1d5db;
+
+  /* Brand colors */
+  --jd-green: #367C2B;
+  --jd-yellow: #FFDE00;
+  --jd-black: #27251F;
+
+  /* Surfaces */
+  --card-bg: #ffffff;
+  --field-bg: #ffffff;
+  --nested-bg: #ffffff;
+  --toolbar-bg: rgba(255,255,255,.95);
+
+  /* Button contrast fix */
+  /*--accent: #e5efe3;*/
+  --accent-2: #e5efe3;
+}

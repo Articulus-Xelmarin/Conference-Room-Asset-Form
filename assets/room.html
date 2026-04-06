@@ -1,0 +1,142 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Room Assets – Conference Room Form</title>
+  <link rel="stylesheet" href="../css/theme-dark.css" />
+  <link rel="stylesheet" href="../css/theme-light.css" />
+  <link rel="stylesheet" href="../css/base.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+          <h1 id="roomTitle">Room Assets</h1>
+          <p id="roomSubtitle">View all AV equipment for this conference room <span class="muted">(v0.2.1)</span></p>
+        </div>
+        <div class="hdr-actions">
+          <button type="button" class="btn secondary" id="editBtn" title="Edit this room">Edit</button>
+          <button type="button" class="btn secondary" id="deleteBtn" title="Delete this room">Delete</button>
+          <button type="button" class="btn ghost" id="themeToggle" aria-pressed="false" title="Toggle light/dark mode"><span class="theme-label">Mode: Dark</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap viewer-container">
+    <!-- Room Summary -->
+    <div class="room-header" id="roomHeader"></div>
+
+    <!-- Room Details Card -->
+    <div class="card asset-section">
+      <legend>Room Configuration</legend>
+      <div id="roomDetails"></div>
+    </div>
+
+    <!-- Room Photos -->
+    <div class="card asset-section">
+      <legend>Room Photos</legend>
+      <div id="roomPhotos"></div>
+    </div>
+
+    <!-- Touch Panels -->
+    <div class="card asset-section">
+      <legend>Touch Panels / Control Systems</legend>
+      <table class="asset-table hidden" id="touchPanelsTable">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Model</th>
+            <th>Serial</th>
+            <th>MAC Address</th>
+            <th>Location</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody id="touchPanelsBody"></tbody>
+      </table>
+      <div id="touchPanelsEmpty" class="empty-section">No touch panels recorded</div>
+    </div>
+
+    <!-- Displays -->
+    <div class="card asset-section">
+      <legend>Displays & Projectors</legend>
+      <table class="asset-table hidden" id="displaysTable">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Size</th>
+            <th>Serial</th>
+            <th>MAC</th>
+            <th>IP</th>
+          </tr>
+        </thead>
+        <tbody id="displaysBody"></tbody>
+      </table>
+      <div id="displaysEmpty" class="empty-section">No displays recorded</div>
+    </div>
+
+    <!-- Speakers -->
+    <div class="card asset-section">
+      <legend>Speakers</legend>
+      <table class="asset-table hidden" id="speakersTable">
+        <thead>
+          <tr>
+            <th>Type</th>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Quantity</th>
+          </tr>
+        </thead>
+        <tbody id="speakersBody"></tbody>
+      </table>
+      <div id="speakersEmpty" class="empty-section">No speakers recorded</div>
+    </div>
+
+    <!-- Microphones -->
+    <div class="card asset-section">
+      <legend>Microphones</legend>
+      <div id="microphonesContent">
+        <div id="micEmpty" class="empty-section">No microphones recorded</div>
+      </div>
+    </div>
+
+    <!-- Other Inventory -->
+    <div class="card asset-section">
+      <legend>Other Devices / Inventory</legend>
+      <table class="asset-table hidden" id="inventoryTable">
+        <thead>
+          <tr>
+            <th>Device Type</th>
+            <th>Make</th>
+            <th>Model</th>
+            <th>Location</th>
+            <th>Barcode</th>
+            <th>Serial</th>
+          </tr>
+        </thead>
+        <tbody id="inventoryBody"></tbody>
+      </table>
+      <div id="inventoryEmpty" class="empty-section">No other devices recorded</div>
+    </div>
+
+    <!-- Technician Info -->
+    <div class="card asset-section">
+      <legend>Technician Information</legend>
+      <div id="techInfo"></div>
+    </div>
+
+    <!-- Navigation -->
+    <div class="navigation-footer">
+      <a href="./index.html" class="btn">Back to Room Finder</a>
+      <a href="../index.html" class="btn secondary">Back to Form</a>
+    </div>
+  </main>
+
+  <script src="../js/theme.js"></script>
+  <script src="../js/sqlite-db.js"></script>
+  <script src="viewer.js"></script>
+</body>
+</html>

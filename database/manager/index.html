@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>Conference Room Form – Local Database</title>
+  <link rel="stylesheet" href="../../css/theme-dark.css" />
+  <link rel="stylesheet" href="../../css/theme-light.css" />
+  <link rel="stylesheet" href="../../css/base.css" />
+</head>
+<body>
+  <header class="site-header">
+    <div class="wrap">
+      <div class="hdr-flex">
+        <img class="jd-logo" alt="John Deere" src="https://cdn-ux.deere.com/brand-foundations/2.0.0/logos/jd-logo.svg#green"/>
+        <div>
+          <h1>Local Database Manager</h1>
+          <p>View, backup, restore, and manage your locally stored conference room records <span class="muted">(v0.2.1)</span></p>
+        </div>
+        <div class="hdr-actions">
+          <button type="button" class="btn ghost" id="themeToggle" aria-pressed="false" title="Toggle light/dark mode"><span class="theme-label">Mode: Dark</span></button>
+        </div>
+      </div>
+    </div>
+  </header>
+
+  <main class="wrap db-container">
+    <!-- Statistics -->
+    <div class="card section-card">
+      <legend>Database Statistics</legend>
+      <p id="dbStats" class="help">Loading...</p>
+      <div class="row-flex-wrap-gap mt-12">
+        <button type="button" id="initializeDb" class="btn secondary">Initialize / Reset Database</button>
+      </div>
+    </div>
+
+    <!-- View Records -->
+    <div class="card section-card">
+      <legend>View Records</legend>
+      <p class="sub">Browse all conference room records stored locally.</p>
+      <div class="row-flex-wrap-gap">
+        <button type="button" id="viewAll" class="btn">View All Records</button>
+        <button type="button" id="viewRecent" class="btn secondary">View Recent 10</button>
+        <button type="button" id="searchBtn" class="btn secondary">Search Records</button>
+      </div>
+      <div id="recordsList" class="mt-16"></div>
+    </div>
+
+    <!-- Backup & Restore -->
+    <div class="card section-card">
+      <legend>Backup & Restore</legend>
+      <p class="sub">Export your database as JSON or restore from a previous backup.</p>
+      <div class="row-flex-wrap-gap">
+        <button type="button" id="exportBackup" class="btn">Export as JSON</button>
+        <button type="button" id="viewBackupInfo" class="btn secondary">View Backup Info</button>
+        <label class="btn ghost">
+          <input type="file" id="importFile" accept="application/json" class="hidden" />
+          Load Backup File
+        </label>
+      </div>
+      <p id="backupStatus" class="mt-12 hidden"></p>
+    </div>
+
+    <!-- Maintenance -->
+    <div class="card section-card">
+      <legend>Maintenance</legend>
+      <p class="sub">Perform database maintenance operations.</p>
+      <div class="row-flex-wrap-gap">
+        <button type="button" id="compactDb" class="btn secondary">Compact Database</button>
+        <button type="button" id="deleteOldRecords" class="btn secondary">Delete Records Older Than 90 Days</button>
+        <button type="button" id="clearDatabase" class="btn secondary text-error">Clear All Records</button>
+      </div>
+      <p id="maintenanceStatus" class="mt-12 hidden"></p>
+    </div>
+
+    <!-- Navigation -->
+    <div class="bottom-border-row">
+      <a href="../../index.html" class="btn">Back to Form</a>
+      <a href="../../config/index.html" class="btn secondary">Configuration & Settings</a>
+    </div>
+  </main>
+
+  <script src="../../js/theme.js"></script>
+  <script src="../../js/sqlite-db.js"></script>
+  <script src="database.js"></script>
+</body>
+</html>

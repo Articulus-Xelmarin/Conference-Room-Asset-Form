@@ -1,0 +1,15 @@
+.btn-margin-right {
+    margin-right: 8px;
+}
+
+.hidden {
+    display: none;
+}
+
+.nav-container {
+    display: flex;
+    gap: 8px;
+    margin-top: 24px;
+    padding-top: 16px;
+    border-top: 1px solid var(--line);
+}
