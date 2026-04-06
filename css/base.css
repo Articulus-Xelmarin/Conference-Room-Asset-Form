@@ -11,7 +11,6 @@ html,body{margin:0;padding:0;background:var(--bg);color:var(--text);font-family:
 .site-header h1{margin:0 0 4px 0;font-size:1.6rem;color:var(--text)}
 .site-header p{margin:0;color:color-mix(in srgb, var(--text) 70%, transparent)}
 .hdr-flex{display:flex;gap:16px;align-items:center}
-.jd-logo{height:56px;width:auto}
 .hdr-actions{margin-left:auto;display:flex;gap:10px;align-items:center}
 .muted{color:var(--muted)}
 

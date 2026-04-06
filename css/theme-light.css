@@ -6,9 +6,9 @@ html[data-theme="light"]{
   --line: #d1d5db;
 
   /* Brand colors */
-  --jd-green: #367C2B;
-  --jd-yellow: #FFDE00;
-  --jd-black: #27251F;
+  --brand-green: #367C2B;
+  --brand-yellow: #FFDE00;
+  --brand-black: #27251F;
 
   /* Surfaces */
   --card-bg: #ffffff;
