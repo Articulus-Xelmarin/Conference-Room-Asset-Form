@@ -75,10 +75,13 @@ try { $stats = dbGetStats(); } catch (Exception $e) {}
         <div class="hdr-actions">
           <button type="button" class="btn ghost" id="themeToggle" aria-pressed="false" title="Toggle light/dark mode"><span class="theme-label">Mode: Dark</span></button>
         </div>
+<<<<<<< HEAD
         <div class="hdr-title">
           <h1>Settings &amp; Configuration</h1>
           <p>Manage database, export data, and configure system settings.</p>
         </div>
+=======
+>>>>>>> 069272d78edbbccf334855ac1a98e3e9efea0bb3
       </div>
     </div>
   </header>

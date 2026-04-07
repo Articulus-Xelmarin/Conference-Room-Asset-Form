@@ -189,10 +189,13 @@ if (isset($_GET['view']) && $_GET['view'] === 'info' && $dbConnected) {
           <a href="?logout" class="btn secondary">Logout</a>
           <button type="button" class="btn ghost" id="themeToggle" aria-pressed="false" title="Toggle light/dark mode"><span class="theme-label">Mode: Dark</span></button>
         </div>
+<<<<<<< HEAD
         <div class="hdr-title">
           <h1>Database Manager</h1>
           <p>Direct database access for administration and maintenance.</p>
         </div>
+=======
+>>>>>>> 069272d78edbbccf334855ac1a98e3e9efea0bb3
       </div>
     </div>
   </header>

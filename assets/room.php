@@ -67,10 +67,13 @@ $title = $room ? trim(($room['facility'] ?? '') . ' – ' . ($room['room_name_id
 <?php endif; ?>
           <button type="button" class="btn ghost" id="themeToggle" aria-pressed="false" title="Toggle light/dark mode"><span class="theme-label">Mode: Dark</span></button>
         </div>
+<<<<<<< HEAD
         <div class="hdr-title">
           <h1><?= e($title) ?></h1>
           <p>Detailed asset inventory for this conference room.</p>
         </div>
+=======
+>>>>>>> 069272d78edbbccf334855ac1a98e3e9efea0bb3
       </div>
     </div>
   </header>
