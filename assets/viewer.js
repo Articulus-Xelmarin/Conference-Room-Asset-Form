@@ -1,10 +1,7 @@
 /**
  * Asset Viewer - Display all assets for a selected room
- * Retrieves roomId from sessionStorage and loads data from SQLite database
+ * Retrieves roomId from sessionStorage and loads data from MariaDB via API
  */
-
-// Database functions are provided by ../js/sqlite-db.js
-// See sqlite-db.js for: getRoomById, getDatabaseStats, etc.
 
 // Render functions for each asset type
 function renderTouchPanels(data) {
@@ -267,18 +264,17 @@ async function initViewer() {
   const roomId = parseInt(sessionStorage.getItem('selectedRoomId'), 10);
 
   if (!roomId) {
-    document.getElementById('roomTitle').textContent = 'Room Not Found';
-    document.body.innerHTML += '<div class="wrap"><div class="card"><p class="text-error">No room selected. <a href="./index.html">Return to finder</a></p></div></div>';
+    document.title = 'Room Not Found';
+    document.body.innerHTML += '<div class="wrap"><div class="card"><p class="text-error">No room selected. <a href="./index.php">Return to finder</a></p></div></div>';
     return;
   }
 
   try {
-    await ensureDatabaseReady();
-    const room = getRoomById(roomId);
+    const room = await DB_API.getRoomById(roomId);
 
     if (!room) {
-      document.getElementById('roomTitle').textContent = 'Room Not Found';
-      document.body.innerHTML += '<div class="wrap"><div class="card"><p class="text-error">Room data not found. <a href="./index.html">Return to finder</a></p></div></div>';
+      document.title = 'Room Not Found';
+      document.body.innerHTML += '<div class="wrap"><div class="card"><p class="text-error">Room data not found. <a href="./index.php">Return to finder</a></p></div></div>';
       return;
     }
 
@@ -290,21 +286,25 @@ async function initViewer() {
       ${room.facility ? `<div class="room-header-item"><strong>Facility</strong>${room.facility}</div>` : ''}
       ${room.building ? `<div class="room-header-item"><strong>Building</strong>${room.building}</div>` : ''}
       ${room.floor ? `<div class="room-header-item"><strong>Floor</strong>${room.floor}</div>` : ''}
-      ${room.room_name ? `<div class="room-header-item"><strong>Room</strong>${room.room_name}</div>` : ''}
+      ${room.room_name_id ? `<div class="room-header-item"><strong>Room</strong>${room.room_name_id}</div>` : ''}
     `;
     document.getElementById('roomHeader').innerHTML = headerHTML;
-    document.getElementById('roomTitle').textContent = `${room.facility || ''} – ${room.room_name || 'Room Assets'}`.trim();
+    document.title = `${room.facility || ''} – ${room.room_name_id || 'Room Assets'}`.trim();
 
     // Room configuration details
     const configHTML = `
       <table class="asset-table mt-0">
         <tbody>
-          ${room.room_code ? `<tr><td><strong>Room Code</strong></td><td>${room.room_code}</td></tr>` : ''}
           ${room.room_type ? `<tr><td><strong>Room Type</strong></td><td>${room.room_type}</td></tr>` : ''}
           ${room.capacity ? `<tr><td><strong>Capacity</strong></td><td>${room.capacity} people</td></tr>` : ''}
-          ${room.room_features ? `<tr><td><strong>Features</strong></td><td>${room.room_features}</td></tr>` : ''}
-          ${room.notes ? `<tr><td><strong>Notes</strong></td><td>${room.notes}</td></tr>` : ''}
-          <tr><td><strong>Record Created</strong></td><td>${formatDate(room.createdAt)}</td></tr>
+          ${room.microsoft_teams ? `<tr><td><strong>Microsoft Teams</strong></td><td>${room.microsoft_teams}</td></tr>` : ''}
+          ${room.room_tech ? `<tr><td><strong>Room Tech</strong></td><td>${room.room_tech}</td></tr>` : ''}
+          ${room.input_types ? `<tr><td><strong>Input Types</strong></td><td>${room.input_types}</td></tr>` : ''}
+          ${room.room_depth ? `<tr><td><strong>Room Depth</strong></td><td>${room.room_depth}</td></tr>` : ''}
+          ${room.room_width ? `<tr><td><strong>Room Width</strong></td><td>${room.room_width}</td></tr>` : ''}
+          ${room.room_height ? `<tr><td><strong>Room Height</strong></td><td>${room.room_height}</td></tr>` : ''}
+          ${room.technician_notes ? `<tr><td><strong>Notes</strong></td><td>${room.technician_notes}</td></tr>` : ''}
+          ${room.created_at ? `<tr><td><strong>Record Created</strong></td><td>${formatDate(room.created_at)}</td></tr>` : ''}
         </tbody>
       </table>
     `;
@@ -326,23 +326,20 @@ async function initViewer() {
     const editBtn = document.getElementById('editBtn');
     if (editBtn) {
       editBtn.addEventListener('click', () => {
-        // Store room ID in sessionStorage for the form to load
         sessionStorage.setItem('editingRoomId', roomId);
-        
-        // Navigate directly to the form page
-        window.location.href = '../index.html';
+        window.location.href = '../index.php';
       });
     }
 
     // Add delete button functionality
     const deleteBtn = document.getElementById('deleteBtn');
     if (deleteBtn) {
-      deleteBtn.addEventListener('click', () => {
-        if (confirm(`Delete "${room.room_name}" from ${room.facility}?\n\nThis action cannot be undone.`)) {
+      deleteBtn.addEventListener('click', async () => {
+        if (confirm(`Delete "${room.room_name_id}" from ${room.facility}?\n\nThis action cannot be undone.`)) {
           try {
-            deleteRoom(roomId);
+            await DB_API.deleteRoom(roomId);
             alert('Room deleted successfully');
-            window.location.href = './index.html';
+            window.location.href = './index.php';
           } catch (err) {
             alert('Error deleting room: ' + err.message);
           }
@@ -351,14 +348,12 @@ async function initViewer() {
     }
 
     // Technician info
-    const techHTML = room.tech_name || room.createdAt ? `
+    const techHTML = room.technician_name || room.tech_date ? `
       <table class="asset-table mt-0">
         <tbody>
-          ${room.createdAt ? `<tr><td><strong>Date</strong></td><td>${formatDate(room.createdAt)}</td></tr>` : ''}
-          ${room.tech_name ? `<tr><td><strong>Technician</strong></td><td>${room.tech_name}</td></tr>` : ''}
-          ${room.tacf ? `<tr><td><strong>RACF</strong></td><td>${room.tacf}</td></tr>` : ''}
-          ${room.tech_email ? `<tr><td><strong>Email</strong></td><td><a href="mailto:${room.tech_email}">${room.tech_email}</a></td></tr>` : ''}
-          ${room.tech_phone ? `<tr><td><strong>Date Last Audited</strong></td><td>${formatDate(room.tech_phone)}</td></tr>` : ''}
+          ${room.tech_date ? `<tr><td><strong>Date</strong></td><td>${room.tech_date}</td></tr>` : ''}
+          ${room.technician_name ? `<tr><td><strong>Technician</strong></td><td>${room.technician_name}</td></tr>` : ''}
+          ${room.racf ? `<tr><td><strong>RACF</strong></td><td>${room.racf}</td></tr>` : ''}
         </tbody>
       </table>
     ` : '<p class="muted">No technician information recorded</p>';
@@ -366,7 +361,7 @@ async function initViewer() {
 
   } catch (error) {
     console.error('Error loading room:', error);
-    document.getElementById('roomTitle').textContent = 'Error Loading Room';
+    document.title = 'Error Loading Room';
     document.body.innerHTML += `<div class="wrap"><div class="card"><p class="text-error">Failed to load room data: ${error.message}</p></div></div>`;
   }
 }

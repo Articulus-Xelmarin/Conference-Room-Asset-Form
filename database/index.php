@@ -5,7 +5,7 @@
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <title>Redirecting...</title>
   <script>
-    window.location.href = './manager/index.html';
+    window.location.href = './manager/index.php';
   </script>
 </head>
 <body>

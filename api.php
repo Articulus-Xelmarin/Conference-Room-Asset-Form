@@ -1,7 +1,7 @@
 <?php
 header('Content-Type: application/json');
 header('Access-Control-Allow-Origin: *');
-header('Access-Control-Allow-Methods: GET, POST, OPTIONS');
+header('Access-Control-Allow-Methods: GET, POST, PUT, DELETE, OPTIONS');
 header('Access-Control-Allow-Headers: Content-Type, Authorization');
 
 if ($_SERVER['REQUEST_METHOD'] === 'OPTIONS') {
@@ -78,32 +78,63 @@ try {
     jsonError('Database connection failed: ' . $e->getMessage(), 500);
 }
 
+$allowedFields = array(
+    'country','state','city','facility','building','floor','room_name_id','room_type','capacity',
+    'microsoft_teams','room_tech','input_types','room_depth','room_width','room_height','tech_date',
+    'technician_name','racf','technician_notes','touch_panels','ceiling_mics','handheld_mics','lapel_mics',
+    'speakers','displays','inventory'
+);
+
+$table = 'conference_rooms';
+
+// ---- Health ----
 if ($_SERVER['REQUEST_METHOD'] === 'GET' && (in_array($endpoint, array('health', '')))) {
+    echo json_encode(array('status' => 'ok'));
+    exit;
+}
+
+// ---- Stats ----
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $endpoint === 'stats') {
+    $stmt = $pdo->query("SELECT COUNT(*) as total, MIN(created_at) as oldest, MAX(created_at) as newest FROM `$table`");
+    $row = $stmt->fetch();
     echo json_encode(array(
-        'status' => 'ok',
-        'endpoint' => $endpoint !== '' ? $endpoint : 'health',
+        'total_records' => (int)$row['total'],
+        'oldest_record' => $row['oldest'],
+        'newest_record' => $row['newest']
     ));
     exit;
 }
 
+// ---- GET records (list all or search) ----
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && $endpoint === 'records') {
+    $search = isset($_GET['q']) ? $_GET['q'] : '';
+    if ($search !== '') {
+        $like = '%' . $search . '%';
+        $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE room_name_id LIKE :q1 OR facility LIKE :q2 OR city LIKE :q3 OR country LIKE :q4 OR building LIKE :q5 ORDER BY id DESC");
+        $stmt->execute(array(':q1'=>$like, ':q2'=>$like, ':q3'=>$like, ':q4'=>$like, ':q5'=>$like));
+    } else {
+        $stmt = $pdo->query("SELECT * FROM `$table` ORDER BY id DESC");
+    }
+    echo json_encode($stmt->fetchAll());
+    exit;
+}
+
+// ---- GET records/{id} ----
+if ($_SERVER['REQUEST_METHOD'] === 'GET' && preg_match('#^records/(\d+)$#', $endpoint, $m)) {
+    $stmt = $pdo->prepare("SELECT * FROM `$table` WHERE id = :id");
+    $stmt->execute(array(':id' => $m[1]));
+    $row = $stmt->fetch();
+    if (!$row) jsonError('Record not found', 404);
+    echo json_encode($row);
+    exit;
+}
+
+// ---- POST records (insert) ----
 if ($_SERVER['REQUEST_METHOD'] === 'POST' && $endpoint === 'records') {
     $body = json_decode(file_get_contents('php://input'), true);
     if (!is_array($body)) {
         jsonError('Invalid JSON payload', 400);
     }
-
-    $table = isset($body['table']) ? preg_replace('/[^a-zA-Z0-9_]/', '', $body['table']) : 'conference_rooms';
-    if ($table === '') {
-        jsonError('Table name is required', 400);
-    }
-
-    // Build insert field list from allowed fields
-    $allowedFields = array(
-        'country','state','city','facility','building','floor','room_name_id','room_type','capacity',
-        'microsoft_teams','room_tech','input_types','room_depth','room_width','room_height','tech_date',
-        'technician_name','racf','technician_notes','touch_panels','ceiling_mics','handheld_mics','lapel_mics',
-        'speakers','displays','inventory'
-    );
 
     $insert = array();
     $params = array();
@@ -131,6 +162,56 @@ if ($_SERVER['REQUEST_METHOD'] === 'POST' && $endpoint === 'records') {
     } catch (Exception $e) {
         jsonError('Insert failed: ' . $e->getMessage(), 500);
     }
+    exit;
+}
+
+// ---- PUT records/{id} (update) ----
+if ($_SERVER['REQUEST_METHOD'] === 'PUT' && preg_match('#^records/(\d+)$#', $endpoint, $m)) {
+    $body = json_decode(file_get_contents('php://input'), true);
+    if (!is_array($body)) {
+        jsonError('Invalid JSON payload', 400);
+    }
+
+    $sets = array();
+    $params = array(':id' => $m[1]);
+
+    foreach ($allowedFields as $field) {
+        if (array_key_exists($field, $body)) {
+            $sets[] = "`$field` = :$field";
+            $params[":$field"] = $body[$field];
+        }
+    }
+
+    if (empty($sets)) {
+        jsonError('No valid fields provided for update', 400);
+    }
+
+    $sql = "UPDATE `$table` SET " . implode(',', $sets) . " WHERE id = :id";
+
+    try {
+        $stmt = $pdo->prepare($sql);
+        $stmt->execute($params);
+        if ($stmt->rowCount() === 0) jsonError('Record not found', 404);
+        echo json_encode(array('updated' => true, 'id' => $m[1]));
+    } catch (Exception $e) {
+        jsonError('Update failed: ' . $e->getMessage(), 500);
+    }
+    exit;
+}
+
+// ---- DELETE records/{id} ----
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && preg_match('#^records/(\d+)$#', $endpoint, $m)) {
+    $stmt = $pdo->prepare("DELETE FROM `$table` WHERE id = :id");
+    $stmt->execute(array(':id' => $m[1]));
+    if ($stmt->rowCount() === 0) jsonError('Record not found', 404);
+    echo json_encode(array('deleted' => true, 'id' => $m[1]));
+    exit;
+}
+
+// ---- DELETE records (clear all) ----
+if ($_SERVER['REQUEST_METHOD'] === 'DELETE' && $endpoint === 'records') {
+    $stmt = $pdo->exec("DELETE FROM `$table`");
+    echo json_encode(array('deleted' => true, 'count' => $stmt));
     exit;
 }
 
